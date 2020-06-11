@@ -8,8 +8,28 @@ def store(request):
     return render(request, template_name="store/store.html", context=context)
 
 def cart(request):
-    return render(request, template_name="store/cart.html", context={})
+
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        items = order.orderitem_set.all() # We are able to query child objects: [parent].[child]_set.all()... reveres query set allows us to access child elements
+    else:
+        items = []
+        order = {'get_total_cart': 0, 'get_total_quantity': 0}
+
+    context = {'items': items, 'order': order}
+    return render(request, template_name="store/cart.html", context=context)
     
 def checkout(request):
-    return render(request, template_name="store/checkout.html", context={})
+    
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        items = order.orderitem_set.all() # We are able to query child objects: [parent].[child]_set.all()... reveres query set allows us to access child elements
+    else:
+        items = []
+        order = {'get_total_cart': 0, 'get_total_quantity': 0}
+
+    context = {'items': items, 'order': order}
+    return render(request, template_name="store/checkout.html", context=context)
     
